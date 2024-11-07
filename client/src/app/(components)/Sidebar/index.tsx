@@ -1,6 +1,7 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { Briefcase, ChevronDown, ChevronUp, Home, Icon, LockIcon, LucideIcon, Search, Settings, User, Users } from "lucide-react";
+import { setIsSidebarCollapsed } from "@/state";
+import { AlertCircle, AlertOctagon, AlertTriangle, Briefcase, ChevronDown, ChevronUp, Home, Icon, Layers3, LockIcon, LucideIcon, Search, Settings, ShieldAlert, User, Users, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,7 +11,12 @@ const Sidebar = () => {
   const [showProjects, setShowProjects] = useState(true);
   const [showPriority, setShowPriority] = useState(true);
 
-  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white w-64`;
+  const dispatch = useAppDispatch();
+  const isSidebarCollapsed = useAppSelector(
+    (state) => state.global.isSidebarCollapsed,
+  );
+
+  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}`;
 
   return (
     <div className={sidebarClassNames}>
@@ -19,6 +25,11 @@ const Sidebar = () => {
           <div className="text-xl font-bold text-gray-800 dark:text-white">
             Sidmn
           </div>
+          {isSidebarCollapsed ? null : (
+            <button className="py-3" onClick = {() => {dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}} >
+              <X className = "h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white" />
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
           <Image src="/logo.png" alt="logo" width={40} height={40} />
@@ -46,12 +57,32 @@ const Sidebar = () => {
         <button onClick={()=>setShowProjects((prev) => !prev)}
           className="flex w-full items-center justify-between px-8 py-3 text-gray-500">
             <span className="">
-              Projexts
+              Projects
             </span>
             {
               showProjects ?(<ChevronUp className="h-5 w-5" />) : <ChevronDown className="h-5 w-5" />
             }
           </button>
+
+          <button onClick={()=>setShowPriority((prev) => !prev)}
+          className="flex w-full items-center justify-between px-8 py-3 text-gray-500">
+            <span className="">
+              Priority
+            </span>
+            {
+              showPriority ?(<ChevronUp className="h-5 w-5" />) : <ChevronDown className="h-5 w-5" />
+            }
+          </button>
+          {showPriority && (
+            <>
+              <SidebarLink icon={AlertCircle} label="Urgent" href="/priority/urgent" />
+              <SidebarLink icon={ShieldAlert} label="High" href="/priority/High" />
+              <SidebarLink icon={AlertTriangle} label="Medium" href="/priority/medium" />
+              <SidebarLink icon={AlertOctagon} label="Low" href="/priority/low" />
+              <SidebarLink icon={Layers3} label="Backlog" href="/priority/backlog" />
+            </>
+          )}
+
       </div>
     </div>
   );
